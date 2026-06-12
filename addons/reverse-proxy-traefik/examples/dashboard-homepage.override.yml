@@ -1,0 +1,20 @@
+# Override for addons/dashboard-homepage/docker-compose.yml — see README.md here.
+services:
+  homepage:
+    ports: !reset [] # reachable only via Traefik
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: "home.example.com" # must match the Host rule
+    networks:
+      - default
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.homepage.rule=Host(`home.example.com`)
+      - traefik.http.routers.homepage.entrypoints=websecure
+      - traefik.http.routers.homepage.tls.certresolver=letsencrypt
+      - traefik.http.routers.homepage.middlewares=internal-only@file
+      - traefik.http.services.homepage.loadbalancer.server.port=3000
+
+networks:
+  proxy:
+    external: true

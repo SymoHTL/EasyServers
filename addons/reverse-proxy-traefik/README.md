@@ -42,6 +42,13 @@ networks:
 `docker compose up -d` — Traefik picks it up live and fetches a certificate
 within seconds.
 
+**Don't want to edit compose files?** [`examples/`](examples/) ships ready-made
+*override files* for Portainer, Beszel, Uptime Kuma, Grafana and Homepage —
+copy one next to the stack, set your domain, done.
+
+**Server not reachable on port 80** (LAN/VPN-only)? Use the DNS challenge for
+wildcard certificates — commented example in [`traefik.yml`](traefik.yml).
+
 ## Protecting admin UIs
 
 `dynamic/middlewares.yml` ships two ready-made middlewares:

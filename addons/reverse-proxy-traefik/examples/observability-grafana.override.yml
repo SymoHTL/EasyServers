@@ -1,0 +1,19 @@
+# Override for paths/02-observability/docker-compose.yml — see README.md here.
+# Grafana keeps its default network (talks to Prometheus/Loki) and joins proxy.
+services:
+  grafana:
+    ports: !reset [] # reachable only via Traefik
+    networks:
+      - default
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.grafana.rule=Host(`grafana.example.com`)
+      - traefik.http.routers.grafana.entrypoints=websecure
+      - traefik.http.routers.grafana.tls.certresolver=letsencrypt
+      - traefik.http.routers.grafana.middlewares=internal-only@file
+      - traefik.http.services.grafana.loadbalancer.server.port=3000
+
+networks:
+  proxy:
+    external: true

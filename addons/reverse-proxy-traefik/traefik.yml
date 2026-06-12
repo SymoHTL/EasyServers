@@ -24,6 +24,14 @@ certificatesResolvers:
       storage: /letsencrypt/acme.json
       httpChallenge:
         entryPoint: web
+      # --- Wildcard certs (*.example.com) via DNS challenge instead ---
+      # Works even when port 80 isn't reachable from the internet (LAN/VPN-only
+      # setups!). Replace httpChallenge above with:
+      # dnsChallenge:
+      #   provider: cloudflare # 100+ providers: https://doc.traefik.io/traefik/https/acme/#providers
+      # ...and pass the provider credential in docker-compose.yml, e.g.:
+      #   environment:
+      #     CF_DNS_API_TOKEN: "your-token"
 
 api:
   dashboard: true
