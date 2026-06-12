@@ -1,0 +1,13 @@
+services:
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    restart: unless-stopped
+    environment:
+      WATCHTOWER_SCHEDULE: "0 0 4 * * *" # daily 04:00 (sec min hour dom mon dow)
+      WATCHTOWER_CLEANUP: "true"          # remove old images
+      WATCHTOWER_LABEL_ENABLE: "true"     # only containers with the enable label (opt-in)
+      WATCHTOWER_NOTIFICATION_URL: ""     # shoutrrr URL — see README
+      # WATCHTOWER_MONITOR_ONLY: "true"   # notify only, don't update
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

@@ -1,0 +1,98 @@
+services:
+  prometheus:
+    image: prom/prometheus:v3.4.1
+    container_name: prometheus
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=30d
+      - --web.enable-lifecycle
+    ports:
+      - "127.0.0.1:9090:9090" # localhost only — access via SSH tunnel or VPN
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/rules:/etc/prometheus/rules:ro
+      - ./prometheus/targets:/etc/prometheus/targets:ro
+      - prometheus-data:/prometheus
+
+  alertmanager:
+    image: prom/alertmanager:v0.28.1
+    container_name: alertmanager
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9093:9093" # localhost only
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager-data:/alertmanager
+
+  grafana:
+    image: grafana/grafana:12.0.2
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_ADMIN_PASSWORD:?set GRAFANA_ADMIN_PASSWORD in .env}"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "3000:3000" # put behind Traefik or VPN for production use
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+
+  loki:
+    image: grafana/loki:3.5.0
+    container_name: loki
+    restart: unless-stopped
+    command: -config.file=/etc/loki/loki-config.yml
+    ports:
+      - "127.0.0.1:3100:3100" # open to other hosts only if they ship logs here
+    volumes:
+      - ./loki/loki-config.yml:/etc/loki/loki-config.yml:ro
+      - loki-data:/loki
+
+  alloy:
+    image: grafana/alloy:v1.9.1
+    container_name: alloy
+    restart: unless-stopped
+    command:
+      - run
+      - /etc/alloy/config.alloy
+      - --storage.path=/var/lib/alloy/data
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - alloy-data:/var/lib/alloy/data
+
+  # Metrics for the monitoring server itself
+  node-exporter:
+    image: prom/node-exporter:v1.9.1
+    container_name: node-exporter
+    restart: unless-stopped
+    command:
+      - --path.rootfs=/host
+    network_mode: host # exposes :9100
+    pid: host
+    volumes:
+      - /:/host:ro,rslave
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: cadvisor
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8085:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    devices:
+      - /dev/kmsg
+
+volumes:
+  prometheus-data:
+  alertmanager-data:
+  grafana-data:
+  loki-data:
+  alloy-data:

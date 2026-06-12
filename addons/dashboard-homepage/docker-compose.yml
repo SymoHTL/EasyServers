@@ -1,0 +1,12 @@
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    restart: unless-stopped
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: "*" # tighten to your domain when behind Traefik
+    ports:
+      - "3080:3000"
+    volumes:
+      - ./config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro # optional: docker integration

@@ -1,0 +1,27 @@
+# Reusable middlewares. Attach to a router with:
+#   traefik.http.routers.<name>.middlewares=internal-only@file
+http:
+  middlewares:
+    # Allow only private/VPN ranges — adjust to your networks.
+    internal-only:
+      ipAllowList:
+        sourceRange:
+          - "10.0.0.0/8"
+          - "172.16.0.0/12"
+          - "192.168.0.0/16"
+          - "100.64.0.0/10" # Tailscale
+
+    # Basic auth for services without their own login.
+    # Generate users with: htpasswd -nB admin
+    basic-auth:
+      basicAuth:
+        users:
+          - "admin:$2y$05$REPLACE-ME-WITH-HTPASSWD-OUTPUT"
+
+    # Sensible security headers for public sites.
+    secure-headers:
+      headers:
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        contentTypeNosniff: true
+        browserXssFilter: true

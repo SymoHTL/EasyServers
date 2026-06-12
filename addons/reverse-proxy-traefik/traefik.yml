@@ -1,0 +1,35 @@
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+
+providers:
+  docker:
+    exposedByDefault: false # only containers with traefik.enable=true
+    network: proxy
+  file:
+    directory: /etc/traefik/dynamic
+    watch: true
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: "you@example.com" # CHANGE ME before first start
+      storage: /letsencrypt/acme.json
+      httpChallenge:
+        entryPoint: web
+
+api:
+  dashboard: true
+  insecure: true # served on :8080, which is bound to 127.0.0.1 in compose
+
+log:
+  level: INFO
+
+accessLog: {} # stdout — picked up by Loki/Alloy or CrowdSec

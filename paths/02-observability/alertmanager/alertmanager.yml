@@ -1,0 +1,32 @@
+# Alertmanager routing. Out of the box alerts go to the 'default' receiver,
+# which does nothing — pick email or ntfy below, fill it in, then:
+#   docker compose restart alertmanager
+route:
+  receiver: default
+  group_by: ["alertname", "instance"]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 12h
+
+receivers:
+  - name: default
+    # --- Option A: ntfy.sh push notifications (easiest — works on any phone) ---
+    # Pick a long random topic name, subscribe to it in the ntfy app, then:
+    # webhook_configs:
+    #   - url: "https://ntfy.sh/YOUR-SECRET-TOPIC-NAME?tpl=yes&title={{ .CommonAnnotations.summary }}"
+    #     send_resolved: true
+
+    # --- Option B: email (SMTP) ---
+    # email_configs:
+    #   - to: "ops@example.com"
+    #     from: "alertmanager@example.com"
+    #     smarthost: "smtp.example.com:587"
+    #     auth_username: "alertmanager@example.com"
+    #     auth_password: "app-password-here"
+    #     send_resolved: true
+
+inhibit_rules:
+  # If a host is down, don't also page about its CPU/RAM/disk
+  - source_matchers: ['alertname = "HostDown"']
+    target_matchers: ['severity = "warning"']
+    equal: ["instance"]

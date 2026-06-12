@@ -1,0 +1,13 @@
+# What CrowdSec reads. Host /var/log is mounted at /var/log/host (read-only).
+filenames:
+  - /var/log/host/auth.log
+  - /var/log/host/syslog
+labels:
+  type: syslog
+---
+# Traefik access logs via Docker (if you run the Traefik add-on):
+# source: docker
+# container_name:
+#   - traefik
+# labels:
+#   type: traefik

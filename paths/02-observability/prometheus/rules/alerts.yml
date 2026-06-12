@@ -1,0 +1,47 @@
+groups:
+  - name: hosts
+    rules:
+      - alert: HostDown
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.instance }} is down"
+          description: "Target {{ $labels.instance }} (job {{ $labels.job }}) has been unreachable for 2 minutes."
+
+      - alert: HostHighCpu
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU on {{ $labels.instance }}"
+          description: "CPU usage is above 90% for 10 minutes (current: {{ $value | printf \"%.0f\" }}%)."
+
+      - alert: HostLowMemory
+        expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes < 0.10
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low memory on {{ $labels.instance }}"
+          description: "Less than 10% of memory available for 10 minutes."
+
+      - alert: HostLowDiskSpace
+        expr: node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs"} / node_filesystem_size_bytes < 0.10
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }}"
+          description: "Filesystem {{ $labels.mountpoint }} has less than 10% free."
+
+      - alert: HostDiskWillFillIn24h
+        expr: predict_linear(node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs"}[6h], 24 * 3600) < 0
+        for: 1h
+        labels:
+          severity: critical
+        annotations:
+          summary: "Disk filling up on {{ $labels.instance }}"
+          description: "At the current rate, {{ $labels.mountpoint }} will be full within 24 hours."

@@ -1,0 +1,18 @@
+services:
+  crowdsec:
+    image: crowdsecurity/crowdsec:latest
+    container_name: crowdsec
+    restart: unless-stopped
+    environment:
+      COLLECTIONS: "crowdsecurity/linux crowdsecurity/sshd crowdsecurity/traefik"
+    ports:
+      - "127.0.0.1:8080:8080" # local API for bouncers on this host
+    volumes:
+      - ./acquis.yaml:/etc/crowdsec/acquis.yaml:ro
+      - /var/log:/var/log/host:ro          # host logs (read-only)
+      - crowdsec-config:/etc/crowdsec
+      - crowdsec-data:/var/lib/crowdsec/data
+
+volumes:
+  crowdsec-config:
+  crowdsec-data:

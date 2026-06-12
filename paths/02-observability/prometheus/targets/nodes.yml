@@ -1,0 +1,19 @@
+# node-exporter targets, one entry per host. Prometheus reloads this file
+# automatically — just save and check http://127.0.0.1:9090/targets
+
+# The monitoring server itself. node-exporter runs with host networking,
+# so it's reached via the Docker bridge gateway (= the host):
+- labels:
+    role: monitoring
+  targets:
+    - "172.17.0.1:9100"
+
+# Remote hosts — uncomment and adapt:
+# - labels:
+#     role: webserver
+#   targets:
+#     - "10.0.0.11:9100"
+# - labels:
+#     role: database
+#   targets:
+#     - "10.0.0.12:9100"

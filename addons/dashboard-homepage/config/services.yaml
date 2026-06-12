@@ -1,0 +1,43 @@
+# Your service map — replace the examples with your real hosts and URLs.
+# Docs: https://gethomepage.dev/configs/services/
+- Monitoring:
+    - Beszel:
+        href: http://hub.example.lan:8090
+        description: Server metrics & alerts
+        icon: beszel.svg
+    - Uptime Kuma:
+        href: http://hub.example.lan:3001
+        description: Uptime checks & status page
+        icon: uptime-kuma.svg
+        # widget:
+        #   type: uptimekuma
+        #   url: http://hub.example.lan:3001
+        #   slug: your-status-page-slug
+    - Grafana:
+        href: http://monitor.example.lan:3000
+        description: Dashboards (Path 02)
+        icon: grafana.svg
+        # widget:
+        #   type: grafana
+        #   url: http://monitor.example.lan:3000
+        #   username: api-user
+        #   password: api-password
+
+- Management:
+    - Portainer:
+        href: https://hub.example.lan:9443
+        description: Container management
+        icon: portainer.svg
+        # widget:
+        #   type: portainer
+        #   url: https://hub.example.lan:9443
+        #   env: 1
+        #   key: your-portainer-api-key
+
+- Servers:
+    - web-01:
+        href: https://web-01.example.lan
+        description: Hetzner FSN1 — reverse proxy + apps
+    - db-01:
+        href: https://db-01.example.lan
+        description: Office rack U7 — PostgreSQL

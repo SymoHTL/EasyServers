@@ -1,0 +1,40 @@
+// Grafana Alloy: ship all local Docker container logs to Loki.
+// (Alloy replaces the deprecated Promtail.)
+
+discovery.docker "containers" {
+  host = "unix:///var/run/docker.sock"
+}
+
+discovery.relabel "containers" {
+  targets = discovery.docker.containers.targets
+
+  // "/my-container" -> container="my-container"
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_image"]
+    target_label  = "image"
+  }
+}
+
+loki.source.docker "containers" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.relabel.containers.output
+  forward_to = [loki.write.default.receiver]
+  labels     = {
+    job  = "docker",
+    host = constants.hostname,
+  }
+}
+
+loki.write "default" {
+  endpoint {
+    // When running Alloy on a REMOTE host, change this to the monitoring
+    // server: http://<monitoring-ip>:3100/loki/api/v1/push
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}

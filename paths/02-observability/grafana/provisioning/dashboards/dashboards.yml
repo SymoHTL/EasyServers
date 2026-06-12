@@ -1,0 +1,13 @@
+# Auto-load any dashboard JSON dropped into grafana/provisioning/dashboards/json/.
+# (Community dashboards are easiest to add via UI import — IDs in the path README.)
+apiVersion: 1
+
+providers:
+  - name: EasyServers
+    folder: EasyServers
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/provisioning/dashboards/json
+      foldersFromFilesStructure: true

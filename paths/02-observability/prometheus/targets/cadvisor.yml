@@ -1,0 +1,14 @@
+# cAdvisor targets (container metrics), one entry per host.
+# Prometheus reloads this file automatically.
+
+# The monitoring server itself (cAdvisor is on the compose network):
+- labels:
+    role: monitoring
+  targets:
+    - "cadvisor:8080"
+
+# Remote hosts — uncomment and adapt (agents compose publishes cAdvisor on :8085):
+# - labels:
+#     role: webserver
+#   targets:
+#     - "10.0.0.11:8085"
